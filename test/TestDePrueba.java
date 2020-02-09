@@ -6,9 +6,9 @@
 
 import interfazad.Departamento;
 import interfazad.Empresa;
-import interfazad.GestorDeFicheros;
 import interfazad.Smartphone;
 import interfazad.Usuario;
+import interfazad.XQDSManager;
 import java.util.ArrayList;
 import junit.framework.Assert;
 import org.junit.After;
@@ -85,27 +85,24 @@ public class TestDePrueba {
         Assert.assertEquals("Departamento", emp.getDepartamento());
     }
     @Test
-    public void test_write_and_read_file(){
-        ArrayList writeData = new ArrayList();
-        String modelos[] = {"Sony Xperia Z2","Iphone 4","Pocophone F1"};
+    public void test_write__read_delete_smartphone(){
+        XQDSManager manager = new XQDSManager();
+        ArrayList readData = manager.LeerSmartphones();
+        int antes = readData.size(), despues = 0;
+        String modelos[] = {"SonyXperiaZ9","Iphone9","PocophoneF9"};
         double versiones[] = {25.0,6.3,28.2};
         int baterias[] = {3000,3000,4000};
         String firmwares[] = {"2343AS567F.SonyXperia","OSI22F34.Apple","198673675.Xiaomi"};
         for (int i=0; i < modelos.length; i++){ 
-            writeData.add(new Smartphone(modelos[i],baterias[i],versiones[i],firmwares[i]));
+            manager.InsertarSmartphone(new Smartphone(modelos[i],baterias[i],versiones[i],firmwares[i]));
         }
-        ArrayList readData = new ArrayList();
-        GestorDeFicheros.EscribirObjetoFichero(writeData, "data.test");
-        readData = GestorDeFicheros.LeerObjetoFichero("data.test", 0);
-        Smartphone x,y;
-        for (int i = 0; i < readData.size(); i++) {
-            x = (Smartphone) writeData.get(i);
-            y = (Smartphone) readData.get(i);
-            Assert.assertEquals(x.getModelo(), y.getModelo());
-            Assert.assertEquals(x.getVersion(), y.getVersion());
-            Assert.assertEquals(x.getBateria(), y.getBateria());
-            Assert.assertEquals(x.getFirmware(), y.getFirmware());
-        }
-        
+        readData = manager.LeerSmartphones();
+        despues = readData.size();
+        Assert.assertNotSame(despues, antes);
+        manager.BorrarSmartphone("SonyXperiaZ9");
+        manager.BorrarSmartphone("Iphone9");
+        manager.BorrarSmartphone("PocophoneF9");
+        readData = manager.LeerSmartphones();
+        Assert.assertEquals(readData.size(), antes);
     }
 }
